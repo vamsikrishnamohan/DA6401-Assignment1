@@ -1,36 +1,54 @@
-print("Importing packages... ", end="")
-##############################################################################
-import wandb
 import numpy as np
-from keras.datasets import fashion_mnist
 import matplotlib.pyplot as plt
+from tensorflow import keras
+from keras.datasets import fashion_mnist
+import wandb
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import confusion_matrix
+import seaborn as sns
+from keras.datasets import mnist
 
-wandb.init(project="trail-1")
-print("Done!")
-##############################################################################
-print("Loading data... ", end="")
-# Load the dataset
-[(x_train, y_train), (x_test, y_test)] = fashion_mnist.load_data()
+# Load dataset
+(X_train, y_train), (X_test, y_test) = fashion_mnist.load_data()
+class_names = ['T-shirt/top', 'Trouser', 'Pullover', 'Dress', 'Coat',
+               'Sandal', 'Shirt', 'Sneaker', 'Bag', 'Ankle boot']
 
-# Get the number of classes and their name mappings
-num_classes = 10
-class_mapping = {0: "T-shirt/top", 1: "Trouser", 2: "Pullover", 3: "Dress", 4: "Coat", 5: "Sandal", 6: "Shirt", 7: "Sneaker", 8: "Bag", 9: "Ankle boot"}
-print("Done!")
+# Initialize wandb
+wandb.init(project="DL-Assignment-1", name="Class Samples")
 
-##############################################################################
-# Plotting a figure from each class
-plt.figure(figsize=[12, 5])
-img_list = []
-class_list = []
+# Define a function to plot samples
+def plot_samples_for_index(sample_index):
+    fig, axes = plt.subplots(2, 5, figsize=(15, 6))
+    axes = axes.flatten()
 
-for i in range(num_classes):
-    position = np.argmax(y_train==i)
-    image = x_train[position,:,:]
-    plt.subplot(2, 5, i+1)
-    plt.imshow(image)
-    plt.title(class_mapping[i])
-    img_list.append(image)
-    class_list.append(class_mapping[i])
-    
-wandb.log({"Question 1": [wandb.Image(img, caption=caption) for img, caption in zip(img_list, class_list)]})
-##############################################################################
+    for class_id in range(10):
+        # Find indices of samples belonging to this class
+        class_indices = np.where(y_train == class_id)[0]
+
+        # Make sure we don't exceed array bounds by using modulo
+        safe_index = sample_index % len(class_indices)
+        selected_idx = class_indices[safe_index]
+
+        # Display the image
+        axes[class_id].imshow(X_train[selected_idx], cmap='gray')
+        axes[class_id].set_title(f"{class_names[class_id]}\nSample #{safe_index}")
+        axes[class_id].axis('off')
+
+    plt.tight_layout()
+    return fig
+
+# Define a range of indices to explore
+sample_indices = list(range(0, 35, 5))  # From 0 to 35, steps of 5
+
+# Log multiple visualizations for different sample indices
+for idx in sample_indices:
+    fig = plot_samples_for_index(idx)
+
+    # Log to wandb with the specific index as the step
+    wandb.log({
+        "Class Samples": wandb.Image(fig)
+    }, step=idx)
+
+    plt.close(fig)
+
+wandb.finish()
