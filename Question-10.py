@@ -24,7 +24,6 @@ X_train, X_val, y_train, y_val = train_test_split(
 y_train_one_hot = np.eye(10)[y_train]
 y_val_one_hot = np.eye(10)[y_val]
 
-
 # Three Best configurations from all the configurations that have high accuracy on MNIST dataset:
 
 ###############################################################
@@ -108,7 +107,6 @@ history = model2.backpropagation(
             loss_type="CrossEntropy"
         )
 
-
 ###############################################################
 y_pred = model2.predict(X_test)
 if len(y_pred.shape) == 1:
@@ -156,7 +154,6 @@ history = model3.backpropagation(
             weight_decay=config.weight_decay,
             loss_type="CrossEntropy"
         )
-
 
 ###############################################################
 y_pred = model3.predict(X_test)
