@@ -1,94 +1,174 @@
-#!/usr/bin/env python
-# coding: utf-8
+from utils import * 
+from nueral_network import NueralNetwork
 
 ###############################################################
-import wandb
-import numpy as np
-import os
-from activations import Sigmoid, Tanh, Relu, Softmax
-from layers import Input, Dense
-from optimizers import Momentum, Nesterov, AdaGrad, RMSProp, Adam, Nadam
-from network import NeuralNetwork
-from loss import CrossEntropy
-from helper import OneHotEncoder, MinMaxScaler
+# Running the best model on MNIST dataset. 
+###############################################################
 
-from sklearn.model_selection import train_test_split
+(X_train_full, y_train_full), (X_test, y_test) = keras.datasets.mnist.load_data()
 
-from keras.datasets import mnist
-import matplotlib.pyplot as plt
+# Normalize data
+X_train_full = X_train_full.astype("float32") / 255.0
+X_test = X_test.astype("float32") / 255.0
+
+# Reshape data (flatten 28x28 to 784)
+X_train_full = X_train_full.reshape(-1, 28*28)
+X_test = X_test.reshape(-1, 28*28)
+
+# Split into training and validation sets (10% for validation)
+X_train, X_val, y_train, y_val = train_test_split(
+	X_train_full, y_train_full, test_size=0.1, random_state=42
+)
+
+# One-hot encode labels
+y_train_one_hot = np.eye(10)[y_train]
+y_val_one_hot = np.eye(10)[y_val]
+
+
+# Three Best configurations from all the configurations that have high accuracy on MNIST dataset:
+
+###############################################################
+# Configuration 1: optimizer = Adam, init = Xavier, activation = RELU, hidden_layer_size = 128, batch_size = 64,  num_hidden_layers = 3
+###############################################################
+config={
+    'optimizer' : 'adam',
+    'hidden_layer_size' :128,
+    'init_method':'xavier',
+    'activation':'relu',
+    'hidden_layers' :[3],
+    'weight_decay': 0.0005,
+    'learning_rate':0.001,
+    'epochs':10,
+    'batch_size': 64
+}
+model1 = NueralNetwork(
+            input_size=784,
+            hidden_layers=[config.hidden_layer_size] * config.hidden_layers,
+            output_size=10,
+            activation=config.activation,
+            init_method=config.init_method
+        )
+
+        # Train model
+history = model1.backpropagation(
+            X_train, y_train_one_hot,
+            batch_size=config.batch_size,
+            learning_rate=config.learning_rate,
+            optimizer=config.optimizer,
+            epochs=config.epochs,
+            weight_decay=config.weight_decay,
+            loss_type="CrossEntropy"
+        )
+
+###############################################################
+y_pred = model1.predict(X_test)
+if len(y_pred.shape) == 1:
+        # If predictions are already class indices
+        y_pred_classes = y_pred
+else:
+        # If predictions are class probabilities
+        y_pred_classes = np.argmax(y_pred, axis=1)
+    
+# y_pred_classes should be an integer array
+y_pred_classes = y_pred_classes.astype(int)
+
+test_accuracy = np.mean(y_pred_classes == y_test)
+print(f"Test accuracy of Model-1: {test_accuracy:.2%}")
+
+###############################################################
+# ## Configuration 2: optimizer = Adam, init = Xavier, activation = tanh, hidden_layer_size = 128, batch_size = 64, num_hidden_layers = 5
+###############################################################
+config={
+    'optimizer' : 'adam',
+    'hidden_layer_size' :128,
+    'init_method':'xavier',
+    'activation':'tanh',
+    'hidden_layers' :[5],
+    'weight_decay': 0,
+    'learning_rate':0.001,
+    'epochs':10,
+    'batch_size': 64
+}
+model2= NueralNetwork(
+            input_size=784,
+            hidden_layers=[config.hidden_layer_size] * config.hidden_layers,
+            output_size=10,
+            activation=config.activation,
+            init_method=config.init_method
+        )
+
+# Train model
+history = model2.backpropagation(
+            X_train, y_train_one_hot,
+            batch_size=config.batch_size,
+            learning_rate=config.learning_rate,
+            optimizer=config.optimizer,
+            epochs=config.epochs,
+            weight_decay=config.weight_decay,
+            loss_type="CrossEntropy"
+        )
 
 
 ###############################################################
-(X_train, y_train), (X_test, y_test) = mnist.load_data()
-print(X_train.shape, y_train.shape, X_test.shape, y_test.shape)
+y_pred = model2.predict(X_test)
+if len(y_pred.shape) == 1:
+        # If predictions are already class indices
+        y_pred_classes = y_pred
+else:
+        # If predictions are class probabilities
+        y_pred_classes = np.argmax(y_pred, axis=1)
+    
+# y_pred_classes should be an integer array
+y_pred_classes = y_pred_classes.astype(int)
 
-X_scaled = X_train/255
-X_test_scaled = X_test/255
-
-X_scaled = X_scaled.reshape(X_scaled.shape[0], X_scaled.shape[1]*X_scaled.shape[2]).T
-X_test_scaled = X_test_scaled.reshape(X_test_scaled.shape[0], X_test_scaled.shape[1]*X_test_scaled.shape[2]).T
-
-encoder = OneHotEncoder()
-t_train = encoder.fit_transform(y_train, 10)
-t_test = encoder.fit_transform(y_test, 10)
-
-###############################################################
-# Configuration 1: optimizer = Adam, init = XavierUniform, activation = tanh, hidden_layer_size = 64, batch_size = 1024,  num_hidden_layers = 1
-###############################################################
-layers = [
-		  Input(data=X_scaled),\
-		  Dense(size=64, activation='Tanh', name='HL1'),\
-		  Dense(size=10, activation='Sigmoid', name='OL')
-	     ]
-
-nn_model1 = NeuralNetwork(layers=layers, batch_size=1024,\
-					      optimizer='Adam', initialization='XavierUniform',\
-                          epochs=10, t=t_train, X_val=X_test_scaled, \
-                          t_val=t_test, loss="CrossEntropy") 
-nn_model1.forward_propogation()
-nn_model1.backward_propogation()
+test_accuracy = np.mean(y_pred_classes == y_test)
+print(f"Test accuracy of Model-1: {test_accuracy:.2%}")
 
 ###############################################################
-acc_test, _, _ = nn_model1.check_test(X_test_scaled, y_test)
-print('Accuracy on test set = {}'.format(acc_test)
+# Configuration 3: optimizer = Adam, init = Xavier, activation = relu, hidden_layer_size = 64, batch_size = 64, num_hidden_layers = 3
+###############################################################
+config={
+    'optimizer' : 'adam',
+    'hidden_layer_size' :64,
+    'init_method':'xavier',
+    'activation':'relu',
+    'hidden_layers' :[3],
+    'weight_decay': 0.0005,
+    'learning_rate':0.001,
+    'epochs':10,
+    'batch_size': 64
+}
+model3 = NueralNetwork(
+            input_size=784,
+            hidden_layers=[config.hidden_layer_size] * config.hidden_layers,
+            output_size=10,
+            activation=config.activation,
+            init_method=config.init_method
+        )
+
+# Train model
+history = model3.backpropagation(
+            X_train, y_train_one_hot,
+            batch_size=config.batch_size,
+            learning_rate=config.learning_rate,
+            optimizer=config.optimizer,
+            epochs=config.epochs,
+            weight_decay=config.weight_decay,
+            loss_type="CrossEntropy"
+        )
+
 
 ###############################################################
-# ## Configuration 2: optimizer = Adam, init = XavierUniform, activation = tanh, hidden_layer_size = 32, batch_size = 128, num_hidden_layers = 1
-###############################################################
-layers = [
-		  Input(data=X_scaled),\
-		  Dense(size=32, activation='Tanh', name='HL1'),\
-		  Dense(size=10, activation='Sigmoid', name='OL')
-	     ]
+y_pred = model3.predict(X_test)
+if len(y_pred.shape) == 1:
+        # If predictions are already class indices
+        y_pred_classes = y_pred
+else:
+        # If predictions are class probabilities
+        y_pred_classes = np.argmax(y_pred, axis=1)
+    
+# y_pred_classes should be an integer array
+y_pred_classes = y_pred_classes.astype(int)
 
-nn_model2 = NeuralNetwork(layers=layers, batch_size=128,\
-					      optimizer='Adam', initialization='XavierUniform',\
-                          epochs=10, t=t_train, X_val=X_test_scaled, \
-                          t_val=t_test, loss="CrossEntropy") 
-nn_model2.forward_propogation()
-nn_model2.backward_propogation()
-
-###############################################################
-acc_test2, _, _ = nn_model2.check_test(X_test_scaled, y_test)
-print('Accuracy on test set = {}'.format(acc_test2)
-
-###############################################################
-# Configuration 3: optimizer = Adam, init = XavierUniform, activation = relu, hidden_layer_size = 32, batch_size = 1024, num_hidden_layers = 1
-###############################################################
-layers = [
-		  Input(data=X_scaled),\
-		  Dense(size=32, activation='Relu', name='HL1'),\
-		  Dense(size=10, activation='Sigmoid', name='OL')
-	     ]
-
-nn_model3 = NeuralNetwork(layers=layers, batch_size=1024,\
-					      optimizer='Adam', initialization='XavierUniform',\
-                          epochs=10, t=t_train, X_val=X_test_scaled, \
-                          t_val=t_test, loss="CrossEntropy") 
-nn_model3.forward_propogation()
-nn_model3.backward_propogation()
-
-###############################################################
-acc_test3, _, _ = nn_model3.check_test(X_test_scaled, y_test)
-print('Accuracy on test set = {}'.format(acc_test3)
-
+test_accuracy = np.mean(y_pred_classes == y_test)
+print(f"Test accuracy of Model-1: {test_accuracy:.2%}")
