@@ -13,16 +13,16 @@ Assignment Report :[WandB report link](https://api.wandb.ai/links/krishvamsi321-
 ## Running the code
 
 ### For Question 1: visualization of samples
-   python Question-1.py
+     python Question-1.py
 
 ### For Training:
-   python train.py
+     python train.py
 
 ### For confusion matrix of best model and its accuracy:
-   python Question-7.py
+     python Question-7.py
 
 ### For 3 best models on MNIST dataset :
-   python Question-10.py  
+     python Question-10.py  
 
 
 ## Question 1
