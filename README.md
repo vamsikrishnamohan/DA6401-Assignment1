@@ -6,23 +6,23 @@ S.Vamsi Krishna Mohan (DA24M026)
 
 Assignment Report :[WandB report link](https://api.wandb.ai/links/krishvamsi321-indian-institute-of-technology-madras/maixp1aa)
 
-#### install the required Python modules using the requirements.txt file:
+### Install the required dependencies using the requirements.txt file:
 ```python
    pip install -r requirements.txt
 ```
-### Running the code
+## Running the code
 
-##### For Question 1: visualization of samples
-in terminal : python Question-1.py
+### For Question 1: visualization of samples
+python Question-1.py
 
-##### For Training:
-             python train.py
+### For Training:
+python train.py
 
-##### For confusion matrix of best model and its accuracy:
-             python Question-7.py
+### For confusion matrix of best model and its accuracy:
+python Question-7.py
 
-##### For 3 best models on MNIST dataset :
-             python Question-10.py  
+### For 3 best models on MNIST dataset :
+python Question-10.py  
 
 
 ## Question 1
