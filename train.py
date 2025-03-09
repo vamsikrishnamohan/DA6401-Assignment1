@@ -117,31 +117,33 @@ def run_wandb_sweep():
 
         wandb.log({"val_accuracy": val_accuracy})
 
-        # logging confusion matrix
-        cm = confusion_matrix(y_val, val_predictions)
-
-        # Create a heatmap using Seaborn
-        plt.figure(figsize=(10, 7))
-        sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", xticklabels=[str(i) for i in range(10)], yticklabels=[str(i) for i in range(10)])
-        plt.xlabel("Predicted Labels")
-        plt.ylabel("True Labels")
-        plt.title("Confusion Matrix")
-
-        # # Save the figure and log to wandb
-        cm_image_path = "confusion_matrix.png"
-        plt.savefig(cm_image_path)
-        plt.close()
-
-        # Log the confusion matrix image to wandb
-        wandb.log({
-            "confusion_matrix": wandb.Image(cm_image_path)
-            
-        })
-
         run.finish()
 
     # Run the sweep
     wandb.agent(sweep_id, train_model,count=50)  # count=50 runs 50 trails of different sweep configurations 
 
 if __name__ == "__main__":
-    run_wandb_sweep()
+
+    parser = argparse.ArgumentParser(description="Training a deep Neural Network with Weights & Biases sweep.")
+    
+    parser.add_argument('-wp', '--wandb_project', type=str, default='DL-Assignment-1', help='Project name used to track experiments in Weights & Biases dashboard')
+    parser.add_argument('-we', '--wandb_entity', type=str, default='krishvamsi321', help='Wandb Entity used to track experiments in the Weights & Biases dashboard.')
+    parser.add_argument('-d', '--dataset', type=str, choices=['mnist', 'fashion_mnist'], default='fashion_mnist', help='Dataset to use for training')
+    parser.add_argument('-e', '--epochs', type=int, default=10, help='Number of epochs to train neural network')
+    parser.add_argument('-b', '--batch_size', type=int, default=32, help='Batch size used to train neural network')
+    parser.add_argument('-l', '--loss', type=str, choices=['mean_squared_error', 'cross_entropy'], default='cross_entropy', help='Loss function to use')
+    parser.add_argument('-o', '--optimizer', type=str, choices=['sgd', 'momentum', 'nag', 'rmsprop', 'adam', 'nadam'], default='adam', help='Optimizer to use')
+    parser.add_argument('-lr', '--learning_rate', type=float, default=0.001, help='Learning rate used to optimize model parameters')
+    parser.add_argument('-m', '--momentum', type=float, default=0.5, help='Momentum used by momentum and nag optimizers')
+    parser.add_argument('-beta', '--beta', type=float, default=0.5, help='Beta used by rmsprop optimizer')
+    parser.add_argument('-beta1', '--beta1', type=float, default=0.5, help='Beta1 used by adam and nadam optimizers')
+    parser.add_argument('-beta2', '--beta2', type=float, default=0.5, help='Beta2 used by adam and nadam optimizers')
+    parser.add_argument('-eps', '--epsilon', type=float, default=0.000001, help='Epsilon used by optimizers')
+    parser.add_argument('-w_d', '--weight_decay', type=float, default=0.0, help='Weight decay used by optimizers')
+    parser.add_argument('-w_i', '--weight_init', type=str, choices=['random', 'xavier'], default='xavier', help='Weight initialization method')
+    parser.add_argument('-nhl', '--num_layers', type=int, default=5, help='Number of hidden layers used in feedforward neural network')
+    parser.add_argument('-sz', '--hidden_size', type=int, default=128, help='Number of hidden neurons in a feedforward layer')
+    parser.add_argument('-a', '--activation', type=str, choices=['identity', 'sigmoid', 'tanh', 'ReLU'], default='relu', help='Activation function to use')
+    
+    args = parser.parse_args()
+    run_wandb_sweep(args)
