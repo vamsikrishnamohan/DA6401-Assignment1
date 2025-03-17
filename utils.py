@@ -10,7 +10,6 @@ from sklearn.metrics import confusion_matrix
 import seaborn as sns
 
 
-from nueral_network import NueralNetwork
-from back_propagation import NueralNetwork
+from nueral_network import NeuralNetwork
+from back_propagation import NeuralNetwork_with_Backprop
 
-import argparse
