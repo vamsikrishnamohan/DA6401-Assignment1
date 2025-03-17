@@ -1,7 +1,7 @@
 from utils import *
-# from nueral_network import NueralNetwork
+from nueral_network import NeuralNetwork
 
-class NueralNetwork(NueralNetwork):  # Extending the previous class
+class NeuralNetwork_with_Backprop(NeuralNetwork):  # Extending the previous class
     def backpropagation(self, X, y, batch_size=32, learning_rate=0.001,
                         optimizer='sgd', epochs=10, beta1=0.9, beta2=0.999,
                         epsilon=1e-8, weight_decay=0,loss_type="CrossEntropy"):
