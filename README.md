@@ -94,7 +94,7 @@ The model can be trained by loading model with model= NueralNetwork(.,.) followe
 
 ```python
 # Initialize model with the chosen hyperparameters
-model = NueralNetwork(
+model = NueralNetwork_with_Backprop(
     input_size=784,
     hidden_layers=[config.hidden_layer_size] * config.hidden_layers,
     output_size=10,
