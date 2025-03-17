@@ -1,5 +1,7 @@
 from utils import *
-from nueral_network import NueralNetwork
+from nueral_network import NeuralNetwork
+from back_propagation import NeuralNetwork_with_Backprop
+import argparse
 
 def generate_sweep_name(config):
     return f"hl_{config.hidden_layers}_bs_{config.batch_size}_ac_{config.activation}_MSE_"
@@ -78,7 +80,7 @@ def run_wandb_sweep():
         y_val_one_hot = np.eye(10)[y_val]
 
         # Initialize model with the chosen hyperparameters
-        model = NueralNetwork(
+        model = NeuralNetwork_with_Backprop(
             input_size=784,
             hidden_layers=[config.hidden_layer_size] * config.hidden_layers,
             output_size=10,
