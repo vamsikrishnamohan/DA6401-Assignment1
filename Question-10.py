@@ -1,5 +1,6 @@
 from utils import * 
-from nueral_network import NueralNetwork
+from nueral_network import NeuralNetwork
+from back_propagation import NeuralNetwork_with_Backprop
 
 ###############################################################
 # Running the best model on MNIST dataset. 
@@ -40,7 +41,7 @@ config={
     'epochs':10,
     'batch_size': 64
 }
-model1 = NueralNetwork(
+model1 = NeuralNetwork_with_Backprop(
             input_size=784,
             hidden_layers=[config.hidden_layer_size] * config.hidden_layers,
             output_size=10,
@@ -88,7 +89,7 @@ config={
     'epochs':10,
     'batch_size': 64
 }
-model2= NueralNetwork(
+model2= NeuralNetwork_with_Backprop(
             input_size=784,
             hidden_layers=[config.hidden_layer_size] * config.hidden_layers,
             output_size=10,
@@ -136,7 +137,7 @@ config={
     'epochs':10,
     'batch_size': 64
 }
-model3 = NueralNetwork(
+model3 = NeuralNetwork_with_Backprop(
             input_size=784,
             hidden_layers=[config.hidden_layer_size] * config.hidden_layers,
             output_size=10,
