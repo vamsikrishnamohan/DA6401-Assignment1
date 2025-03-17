@@ -1,5 +1,6 @@
 from utils import *
-from nueral_network import NueralNetwork
+from nueral_network import NeuralNetwork
+from back_propagation import NeuralNetwork_with_Backprop
 
 #################################################################### 
 # #  Getting the Best Model from sweeps and logging the confusion matrix on Test Data 
@@ -23,7 +24,7 @@ def test_best_model():
                   'Sandal', 'Shirt', 'Sneaker', 'Bag', 'Ankle boot']
     
     # Best model from sweeps
-    best_model = NueralNetwork(
+    best_model = NeuralNetwork_with_Backprop(
         input_size=784,
         hidden_layers=[128, 128, 128, 128, 128],  # 5 hidden layers of size 128
         output_size=10,
